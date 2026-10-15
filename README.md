@@ -3,7 +3,7 @@
 ## Course
 
 COSC 594 - Biometrics  
-Project 2: Reproduce + Investigate
+Project 2: Reproduce and Investigate
 
 ## Overall Topic
 

@@ -32,3 +32,12 @@ membership, and unusually short sequences before OpenGait preprocessing.
 
 The resulting dataset statistics were reviewed manually before being
 recorded as an experiment.
+
+### Reproduction Environment Setup
+
+AI assistance was used to help organize the OpenGait reproduction
+environment, including repository version pinning, dependency isolation,
+and separation of third-party code from original project work.
+
+The selected OpenGait commit and environment configuration were verified
+before preprocessing or model training.
