@@ -21,3 +21,14 @@ Project decisions, implementation choices, experiments, evaluation,
 interpretation, and final conclusions are reviewed and completed by the author.
 
 AI-generated suggestions are treated as guidance and are verified before being included in the project.
+
+### Dataset Audit Support
+
+AI assistance was used to help design and review a CASIA-B dataset audit
+script.
+
+The script checks dataset structure, sequence frame counts, train/test
+membership, and unusually short sequences before OpenGait preprocessing.
+
+The resulting dataset statistics were reviewed manually before being
+recorded as an experiment.
