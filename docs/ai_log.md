@@ -49,3 +49,15 @@ and design a script for comparing the raw and processed CASIA-B datasets.
 
 The processed dataset counts and the single missing sequence were verified
 using locally generated results before being documented.
+
+### GaitPart Configuration Review
+
+AI assistance was used to compare the OpenGait GaitPart configuration
+with the OpenGait default configuration and identify settings inherited
+during configuration loading.
+
+A project-specific reference configuration was created so that the full
+experimental setup is explicit and reproducible.
+
+Any future hardware-specific configuration changes will be documented
+separately from the reference configuration.

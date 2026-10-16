@@ -70,3 +70,33 @@ The final repository will document:
 - model checkpoints
 - raw result files
 - all deviations from the original paper
+
+
+## Reproduction Configuration
+
+The project-specific GaitPart configuration is stored at:
+
+`configs/gaitpart_casiab_reference.yaml`
+
+OpenGait normally merges `configs/gaitpart/gaitpart.yaml` with
+`configs/default.yaml` at runtime.
+
+For reproducibility, the Project 2 configuration explicitly records the
+relevant inherited settings rather than relying only on implicit defaults.
+
+The reference configuration preserves the OpenGait GaitPart settings,
+including:
+
+- CASIA-B subjects 001-074 for training
+- CASIA-B subjects 075-124 for testing
+- Adam optimizer
+- learning rate 0.0001
+- triplet-loss margin 0.2
+- 8 x 16 training batch structure
+- 30 ordered training frames
+- 120,000 training iterations
+- Euclidean-distance matching
+- 16 part-level feature regions
+
+Hardware-specific changes, if required for the available GPU, will be
+stored separately rather than modifying the reference configuration.

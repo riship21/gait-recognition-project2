@@ -1,0 +1,147 @@
+# Project 2 reference configuration
+# GaitPart reproduction on CASIA-B
+
+# This file explicitly includes settings that OpenGait normally inherits
+# from configs/default.yaml so the experiment configuration is clear.
+
+data_cfg:
+  dataset_name: CASIA-B
+
+  # This path is relative to third_party/OpenGait because OpenGait
+  # will be launched from that directory.
+  dataset_root: ../../data/processed/CASIA-B-pkl
+
+  num_workers: 1
+
+  # Official OpenGait CASIA-B split:
+  # Train: 001-074
+  # Test: 075-124
+  dataset_partition: ./datasets/CASIA-B/CASIA-B.json
+
+  remove_no_gallery: false
+  cache: false
+  test_dataset_name: CASIA-B
+
+
+evaluator_cfg:
+  enable_float16: false
+  restore_ckpt_strict: true
+
+  # Final GaitPart checkpoint
+  restore_hint: 120000
+
+  save_name: GaitPart
+
+  eval_func: evaluate_indoor_dataset
+
+  sampler:
+    batch_size: 16
+    sample_type: all_ordered
+    type: InferenceSampler
+
+  transform:
+    - type: BaseSilCuttingTransform
+
+  metric: euc
+
+  cross_view_gallery: false
+
+
+loss_cfg:
+  loss_term_weight: 1.0
+  margin: 0.2
+  type: TripletLoss
+  log_prefix: triplet
+
+
+model_cfg:
+  model: GaitPart
+
+  backbone_cfg:
+    in_channels: 1
+
+    layers_cfg:
+      - BC-32
+      - BC-32
+      - M
+      - FC-64-2
+      - FC-64-2
+      - M
+      - FC-128-3
+      - FC-128-3
+
+    type: Plain
+
+  SeparateFCs:
+    in_channels: 128
+    out_channels: 128
+    parts_num: 16
+
+  bin_num:
+    - 16
+
+
+optimizer_cfg:
+  lr: 0.0001
+  momentum: 0.9
+  solver: Adam
+  weight_decay: 0.0
+
+
+scheduler_cfg:
+  gamma: 0.1
+
+  milestones:
+    - 100000
+
+  scheduler: MultiStepLR
+
+
+trainer_cfg:
+  find_unused_parameters: false
+
+  enable_float16: true
+
+  # Evaluate periodically while training.
+  with_test: true
+
+  fix_BN: false
+
+  log_iter: 100
+
+  restore_ckpt_strict: true
+
+  optimizer_reset: false
+  scheduler_reset: false
+
+  restore_hint: 0
+
+  save_iter: 10000
+
+  save_name: GaitPart
+
+  sync_BN: false
+
+  total_iter: 120000
+
+  sampler:
+    batch_shuffle: false
+
+    # P x K batch structure:
+    # 8 identities x 16 sequences
+    batch_size:
+      - 8
+      - 16
+
+    frames_num_fixed: 30
+    frames_num_max: 50
+    frames_num_min: 25
+
+    frames_skip_num: 10
+
+    sample_type: fixed_ordered
+
+    type: TripletSampler
+
+  transform:
+    - type: BaseSilCuttingTransform
