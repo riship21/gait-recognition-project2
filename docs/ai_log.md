@@ -41,3 +41,11 @@ and separation of third-party code from original project work.
 
 The selected OpenGait commit and environment configuration were verified
 before preprocessing or model training.
+
+### OpenGait Preprocessing Audit
+
+AI assistance was used to help review the OpenGait preprocessing workflow
+and design a script for comparing the raw and processed CASIA-B datasets.
+
+The processed dataset counts and the single missing sequence were verified
+using locally generated results before being documented.

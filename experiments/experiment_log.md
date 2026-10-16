@@ -114,3 +114,34 @@ OpenGait's preprocessing behavior will be preserved so that the
 reproduction remains faithful to the selected implementation.
 
 The processed OpenGait dataset will be audited again after preprocessing.
+
+## Experiment 2 - OpenGait CASIA-B Preprocessing
+
+### Goal
+
+Convert the raw CASIA-B silhouette sequences into the processed format
+required by OpenGait and verify which sequences survive preprocessing.
+
+### Input
+
+Raw CASIA-B silhouettes from Project 1:
+
+`../biometrics-project1-gait-recognition/data/raw/CASIA-B/GaitDatasetB-silh`
+
+### Method
+
+The pinned OpenGait preprocessing script was used:
+
+`datasets/pretreatment.py`
+
+Important settings:
+
+- image size: 64
+- dataset: CASIAB
+- workers: 4
+- output format: pickle (`.pkl`)
+
+Command:
+
+```powershell
+python .\third_party\OpenGait\datasets\pretreatment.py --input_path "..\biometrics-project1-gait-recognition\data\raw\CASIA-B\GaitDatasetB-silh" --output_path ".\data\processed\CASIA-B-pkl" --n_workers 4 --img_size 64 --dataset CASIAB --log_file ".\results\raw\opengait_pretreatment.log"
