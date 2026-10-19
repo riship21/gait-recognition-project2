@@ -144,4 +144,41 @@ Important settings:
 Command:
 
 ```powershell
+
 python .\third_party\OpenGait\datasets\pretreatment.py --input_path "..\biometrics-project1-gait-recognition\data\raw\CASIA-B\GaitDatasetB-silh" --output_path ".\data\processed\CASIA-B-pkl" --n_workers 4 --img_size 64 --dataset CASIAB --log_file ".\results\raw\opengait_pretreatment.log"
+
+```
+
+## Experiment 3 - MSI GPU Environment and Smoke-Test Preparation
+
+### Goal
+
+Prepare the GPU environment required to run GaitPart and verify that the
+processed CASIA-B dataset is available on the training machine.
+
+### Environment
+
+- MSI GS66
+- NVIDIA GeForce RTX 3060 Laptop GPU
+- 6 GB VRAM
+- WSL2 / Ubuntu 22.04
+- Python 3.9.25
+- PyTorch 2.2.2+cu121
+- CUDA runtime 12.1
+
+### Dataset Verification
+
+The processed CASIA-B dataset was successfully transferred into the WSL
+project environment.
+
+Verified:
+
+- 124 subject folders
+- 13,592 processed `.pkl` sequences
+
+### Status
+
+Environment setup is complete.
+
+The next step is to run a small GaitPart training smoke test before
+starting the full reproduction experiment.

@@ -71,3 +71,33 @@ Current preprocessing dependencies include:
 
 PyTorch and CUDA dependencies will be documented after configuration of
 the NVIDIA GPU machine.
+
+## MSI GPU Environment
+
+GPU machine:
+
+- MSI GS66
+- WSL2
+- Ubuntu 22.04
+- NVIDIA GeForce RTX 3060 Laptop GPU
+- GPU memory: 6 GB
+- NVIDIA driver: 552.12
+- Windows-reported CUDA support: 12.4
+
+Project environment:
+
+- Conda environment: `gaitpart-p2`
+- Conda: 26.3.2
+- Python: 3.9.25
+- PyTorch: 2.2.2+cu121
+- PyTorch CUDA runtime: 12.1
+- CUDA available in PyTorch: Yes
+
+The processed CASIA-B dataset was transferred to the WSL filesystem.
+
+Verified processed dataset:
+
+- Subjects: 124
+- Pickle sequences: 13,592
+
+The next step is a short GaitPart smoke test before full training.
