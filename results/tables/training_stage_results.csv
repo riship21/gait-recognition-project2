@@ -1,0 +1,4 @@
+iterations,identities_per_batch,sequences_per_identity,nm_rank1_percent,bg_rank1_percent,cl_rank1_percent
+500,2,2,48.49,37.23,14.07
+10000,4,8,91.25,82.99,67.23
+30000,4,8,94.2,87.19,73.03
