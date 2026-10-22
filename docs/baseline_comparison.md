@@ -109,7 +109,21 @@ The GEI baseline correctly identified 95 of 100 probe sequences.
 
 GaitPart achieved 100.00% Rank-1 accuracy for the matched 90-degree identification experiment.
 
-**Dataset coverage verification:** The GaitPart evaluation succeeded on the held-out partition, but an independent check confirming the presence of all 300 intended 90-degree gallery and probe sequences is still pending.
+### Dataset Coverage Verification
+
+The GaitPart processed dataset was independently checked for all intended 90-degree normal-walking sequences from subjects 075–124.
+
+Results:
+
+- Expected gallery sequences: 200
+- Expected probe sequences: 100
+- Total expected sequences: 300
+- Sequences present: 300
+- Missing sequences: 0
+
+All intended gallery and probe sequence files were present for the matched evaluation.
+
+This confirms dataset-file coverage; the identification accuracy was measured separately by the evaluator.
 
 ## Additional GaitPart Results
 
@@ -169,6 +183,25 @@ The broader GaitPart results also show differences in robustness across walking 
 
 Normal walking produced the highest recognition accuracy, while clothing variation remained the most challenging condition.
 
+### Temporal Sequence-Length Investigation
+
+A controlled inference-frame ablation was completed using the same 30,000-iteration checkpoint.
+
+| Maximum Inference Frames | NM Rank-1 | BG Rank-1 | CL Rank-1 |
+|---|---:|---:|---:|
+| 15 | 63.99% | 54.19% | 42.32% |
+| 30 | 86.25% | 76.34% | 62.16% |
+| 50 | 91.77% | 84.22% | 70.13% |
+| Unlimited | 94.20% | 87.19% | 73.03% |
+
+Recognition accuracy improved as more frames were available during inference.
+
+The study used the first N available frames, rather than uniformly sampled frames. Sequences shorter than the frame limit retained their available frames.
+
+These results demonstrate sensitivity to inference sequence length, but do not isolate the effects of individual GaitPart architecture components.
+
+Complete experimental details are recorded in `experiments/experiment_log.md`.
+
 ## Limitations
 
 - GEI and GaitPart use different feature representations and preprocessing procedures.
@@ -176,10 +209,10 @@ Normal walking produced the highest recognition accuracy, while clothing variati
 - The matched comparison evaluates only normal walking at a single 90-degree camera viewpoint.
 - GaitPart's broader cross-view results cannot be directly compared with the GEI single-view baseline.
 - The GaitPart model has completed 30,000 of the reference configuration's 120,000 training iterations.
-- Complete availability of the 300 intended GaitPart gallery and probe sequences remains to be independently verified.
 - The matched comparison uses one trained GaitPart model; variability across training seeds has not been measured.
 - The 100.00% result applies to this particular identification protocol and does not establish universal superiority.
 - A full architectural ablation of GaitPart has not yet been performed.
+- The sequence-length investigation uses first-N-frame truncation rather than uniform temporal sampling.
 
 ## Conclusion
 
@@ -187,11 +220,13 @@ The matched evaluation demonstrates that the reproduced GaitPart model achieved 
 
 GaitPart achieved 100.00% accuracy, while the GEI baseline achieved 95.00%.
 
+All 300 intended GaitPart gallery and probe sequence files were verified as present.
+
 Additional GaitPart evaluations demonstrated strong cross-view recognition performance under normal walking, bag carrying, and clothing variation.
 
-These findings support the usefulness of learned gait representations, while also showing that recognition performance depends on walking conditions and camera viewpoints.
+The completed temporal sequence-length investigation also showed that recognition performance consistently improved as more walking frames were made available during inference.
 
-Further investigation of temporal sequence length will help characterize how the amount of available walking information affects GaitPart recognition performance.
+These findings support the usefulness of learned gait representations, while also showing that recognition performance depends on walking conditions, camera viewpoints, and available sequence duration.
 
 ## Reproducibility
 
@@ -200,6 +235,9 @@ The relevant project files are:
 - `scripts/evaluate_gei_matched.py` — Reproduces the GEI baseline under the held-out 90-degree protocol.
 - `patches/gaitpart_matched_90.patch` — Adds matched-view accuracy reporting to the pinned OpenGait evaluator.
 - `configs/gaitpart_casiab_eval_30000.yaml` — Evaluation configuration for the 30,000-iteration checkpoint.
+- `configs/gaitpart_casiab_ablation_15frames.yaml` — 15-frame evaluation configuration.
+- `configs/gaitpart_casiab_ablation_30frames.yaml` — 30-frame evaluation configuration.
+- `configs/gaitpart_casiab_ablation_50frames.yaml` — 50-frame evaluation configuration.
 - `experiments/experiment_log.md` — Chronological record of experiments and results.
 - `docs/reproduction_plan.md` — Reproduction environment and execution instructions.
 

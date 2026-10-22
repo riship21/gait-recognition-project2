@@ -144,10 +144,14 @@ Important settings:
 Command:
 
 ```powershell
-
 python .\third_party\OpenGait\datasets\pretreatment.py --input_path "..\biometrics-project1-gait-recognition\data\raw\CASIA-B\GaitDatasetB-silh" --output_path ".\data\processed\CASIA-B-pkl" --n_workers 4 --img_size 64 --dataset CASIAB --log_file ".\results\raw\opengait_pretreatment.log"
-
 ```
+
+### Results
+
+The preprocessing produced 13,592 pickle sequence files from the available CASIA-B silhouettes.
+
+The processed sequences were subsequently transferred to the MSI WSL environment for training.
 
 ## Experiment 3 - MSI GPU Environment and Smoke-Test Preparation
 
@@ -178,10 +182,9 @@ Verified:
 
 ### Status
 
-Environment setup is complete.
+Environment setup completed successfully.
 
-The next step is to run a small GaitPart training smoke test before
-starting the full reproduction experiment.
+Subsequent smoke testing confirmed that GaitPart could initialize, train, and save checkpoints on the GPU.
 
 ## Experiment 4 - NumPy Serialization Compatibility
 
@@ -447,23 +450,81 @@ Train GaitPart for a substantially longer schedule to improve learned identity r
 - Model: GaitPart
 - Batch composition: [4, 8]
 - First-stage training target: 10,000 iterations
-- Planned reference target: 120,000 iterations
+- Final completed training target: 30,000 iterations
+- Reference configuration target: 120,000 iterations
 - Optimizer: Adam
 - Learning rate: 0.0001
+- Triplet-loss margin: 0.2
 - Mixed precision: Enabled
 - Checkpoint interval: 2,000 iterations
 
+Configuration files:
+
+- `configs/gaitpart_casiab_full.yaml`
+- `configs/gaitpart_casiab_30000.yaml`
+- `configs/gaitpart_casiab_eval_10000.yaml`
+- `configs/gaitpart_casiab_eval_30000.yaml`
+
+### Method
+
+The initial model was trained from iteration 0 to iteration 10,000.
+
+Training was then resumed from the saved iteration-10,000 checkpoint and continued to iteration 30,000.
+
+The same model architecture, batch composition, optimizer, and learning-rate scheduler were preserved across both training stages.
+
+Recognition performance was measured using the official CASIA-B evaluation protocol, excluding identical-view comparisons.
+
 ### Status
 
-In progress on the MSI RTX 3060 Laptop GPU.
+Completed successfully on the MSI RTX 3060 Laptop GPU.
 
-### Results
+### Training Results
 
-Pending completion of the 10,000-iteration training stage.
+| Stage | Iterations | Runtime | Final Reported Triplet Loss |
+|---|---|---|---:|
+| Initial training | 0–10,000 | 44 minutes 35 seconds | 0.2003 |
+| Resumed training | 10,000–30,000 | 1 hour 31 minutes 20 seconds | 0.2045 |
 
-### Next Steps
+The model successfully resumed training from the iteration-10,000 checkpoint.
 
-Verify the saved checkpoint, assess training behavior, and proceed with the planned evaluation and subsequent training stages.
+The final checkpoint was saved as:
+
+`GaitPart_Full_B32-30000.pt`
+
+Training loss remained finite but did not decrease consistently. Therefore, identification accuracy was used to assess the model's actual recognition performance.
+
+### Rank-1 Recognition Results
+
+| Training Iterations | Normal Walking (NM) | Carrying Bag (BG) | Clothing Variation (CL) |
+|---|---:|---:|---:|
+| 10,000 | 91.25% | 82.99% | 67.23% |
+| 30,000 | 94.20% | 87.19% | 73.03% |
+| Improvement | +2.95 pp | +4.20 pp | +5.80 pp |
+
+Both evaluations used the held-out CASIA-B subjects 075–124.
+
+### Observations
+
+Identification accuracy improved across all three walking conditions between 10,000 and 30,000 iterations.
+
+Clothing variation showed the largest improvement but remained the most challenging condition.
+
+These results demonstrate that additional training improved recognition performance along the same training trajectory, even though the triplet loss did not decrease monotonically.
+
+### Conclusion
+
+The extended training and evaluation pipeline completed successfully.
+
+The 30,000-iteration GaitPart model achieved:
+
+- Normal walking Rank-1 accuracy: 94.20%
+- Bag-carrying Rank-1 accuracy: 87.19%
+- Clothing-variation Rank-1 accuracy: 73.03%
+
+The model completed 30,000 rather than the reference configuration's 120,000 iterations. This deviation is documented as a limitation of the reproduction.
+
+---
 
 ## Experiment 11 - Temporal Sequence-Length Ablation
 
@@ -565,4 +626,3 @@ However, the experiment does not isolate the contribution of GaitPart's temporal
 Increasing the maximum number of inference frames consistently improved GaitPart Rank-1 recognition accuracy across normal walking, bag-carrying, and clothing-variation conditions.
 
 This demonstrates the importance of sequence duration for the reproduced model's identification performance, especially in cross-view scenarios.
-
