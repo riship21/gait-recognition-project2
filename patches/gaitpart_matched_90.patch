@@ -6,7 +6,7 @@ index d6655a1..3c9865b 100644
                  idx = dist.topk(num_rank, largest=False)[1].cpu().numpy()
                  acc[type_][v1, v2, :] = np.round(np.sum(np.cumsum(np.reshape(probe_y, [-1, 1]) == gallery_y[idx[:, 0:num_rank]], 1) > 0,
                                                       0) * 100 / dist.shape[0], 2)
-+                                                     
++
 +    # Project 2: Matched GEI vs. GaitPart comparison.
 +    # Extract 90-degree normal-walking Rank-1 accuracy.
 +    if dataset == "CASIA-B":
