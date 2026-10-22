@@ -1,0 +1,5 @@
+frame_limit,nm_rank1_percent,bg_rank1_percent,cl_rank1_percent,matched_nm_090_rank1_percent
+15,63.99,54.19,42.32,99.0
+30,86.25,76.34,62.16,100.0
+50,91.77,84.22,70.13,100.0
+unlimited,94.2,87.19,73.03,100.0

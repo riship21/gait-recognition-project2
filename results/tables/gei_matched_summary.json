@@ -1,0 +1,20 @@
+{
+  "method": "Project 1 GEI Euclidean",
+  "view": "090",
+  "subjects_requested": 50,
+  "subjects_included": 50,
+  "subjects_excluded": [],
+  "gallery_sequences": [
+    "nm-01",
+    "nm-02",
+    "nm-03",
+    "nm-04"
+  ],
+  "probe_sequences": [
+    "nm-05",
+    "nm-06"
+  ],
+  "correct": 95,
+  "total": 100,
+  "rank1_percent": 95.0
+}
