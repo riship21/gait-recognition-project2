@@ -464,3 +464,105 @@ Pending completion of the 10,000-iteration training stage.
 ### Next Steps
 
 Verify the saved checkpoint, assess training behavior, and proceed with the planned evaluation and subsequent training stages.
+
+## Experiment 11 - Temporal Sequence-Length Ablation
+
+### Goal
+
+Investigate how limiting the number of silhouette frames available during inference affects GaitPart identification accuracy.
+
+### Research Question
+
+How does temporal input length affect Rank-1 gait identification under different walking conditions and camera viewpoints?
+
+### Hypothesis
+
+Longer walking sequences provide more temporal information and may improve identification performance. Improvements may diminish as the available sequence length increases.
+
+### Experimental Setup
+
+- Dataset: CASIA-B
+- Evaluation subjects: 075–124
+- Model: GaitPart
+- Checkpoint: 30,000 iterations
+- Batch composition during training: [4, 8]
+- Evaluation metric: Rank-1 identification
+- Matching metric: Euclidean distance
+- Viewpoint protocol: Identical-view comparisons excluded for cross-view averages
+
+### Independent Variable
+
+Maximum number of inference frames:
+
+- 15
+- 30
+- 50
+- Unlimited
+
+### Controlled Variables
+
+The same trained model checkpoint, CASIA-B test partition, gallery/probe definitions, preprocessing, and matching metric were used throughout the experiments.
+
+### Frame-Selection Policy
+
+OpenGait's `frames_all_limit` parameter was used to cap inference sequences.
+
+The first N available frames were selected for each limited-frame experiment.
+
+Sequences shorter than the specified limit retained their available frames.
+
+Consequently, the experiment evaluates maximum sequence length rather than enforcing exactly N frames for every sequence.
+
+### Cross-View Rank-1 Results
+
+| Frame Limit | Normal Walking | Carrying Bag | Clothing Variation |
+|---|---:|---:|---:|
+| 15 | 63.99% | 54.19% | 42.32% |
+| 30 | 86.25% | 76.34% | 62.16% |
+| 50 | 91.77% | 84.22% | 70.13% |
+| Unlimited | 94.20% | 87.19% | 73.03% |
+
+### Matched 90-Degree Normal-Walking Results
+
+| Frame Limit | Rank-1 Accuracy |
+|---|---:|
+| 15 | 99.00% |
+| 30 | 100.00% |
+| 50 | 100.00% |
+| Unlimited | 100.00% |
+
+### Observations
+
+Increasing the inference frame limit improved cross-view recognition accuracy across NM, BG, and CL.
+
+The largest performance improvements occurred between 15 and 30 frames.
+
+Further improvements were observed between 30 and 50 frames and between 50 frames and the unlimited-frame evaluation.
+
+Clothing variation produced the lowest accuracy under every frame setting.
+
+The 90-degree same-view identification experiment achieved high accuracy even when only the first 15 frames were available.
+
+### Interpretation
+
+These findings indicate that GaitPart's recognition performance is sensitive to the amount of temporal information supplied during inference, particularly in cross-view identification.
+
+Longer sequences may expose additional gait cycles and more representative walking patterns.
+
+However, the experiment does not isolate the contribution of GaitPart's temporal modeling modules. Such a conclusion would require an architectural ablation.
+
+### Limitations
+
+- The experiment uses first-N-frame truncation rather than uniformly distributed frame sampling.
+- Sequences shorter than the specified limit retain their available frames.
+- The effective number of input frames may vary between sequences.
+- Only one trained checkpoint was evaluated.
+- The study does not measure variability across training seeds.
+- The experiments were conducted on the existing CASIA-B held-out test partition.
+
+### Conclusion
+
+Increasing the maximum number of inference frames consistently improved GaitPart Rank-1 recognition accuracy across normal walking, bag-carrying, and clothing-variation conditions.
+
+This demonstrates the importance of sequence duration for the reproduced model's identification performance, especially in cross-view scenarios.
+
