@@ -274,3 +274,181 @@ A chronological record of experiments, observed failures, configuration changes,
 `experiments/experiment_log.md`
 
 Further investigations and final results will be added as training progresses.
+
+
+## Final Verified Experiments and Reproduction Commands
+
+### Software Environment
+
+The project's Conda environment is exported in:
+
+`environment.yml`
+
+The environment was verified with:
+
+- Python 3.9.25
+- PyTorch 2.2.2+cu121
+- NumPy 1.23.5
+- CUDA 12.1 runtime
+- NVIDIA RTX 3060 Laptop GPU
+
+To recreate the environment, start with:
+
+```bash
+conda env create -f environment.yml
+conda activate gaitpart-p2
+```
+
+The exported environment includes CUDA-specific PyTorch wheel versions. If Conda cannot resolve those packages through the configured package sources, install the compatible PyTorch 2.2.2 and torchvision 0.17.2 CUDA 12.1 builds using the appropriate PyTorch wheel index.
+
+The environment export documents the working package versions, but recreation on a fresh machine has not been independently verified.
+
+### Final GaitPart Training Configuration
+
+The main reproduction experiment used:
+
+- Dataset: CASIA-B
+- Training subjects: 001–074
+- Model: GaitPart
+- Batch composition: [4, 8]
+- Optimizer: Adam
+- Learning rate: 0.0001
+- Triplet-loss margin: 0.2
+- Mixed precision: Enabled
+- Completed training iterations: 30,000
+
+The experiment differs from the reference 120,000-iteration configuration because of available hardware and project constraints.
+
+The first 10,000 iterations used:
+
+`configs/gaitpart_casiab_full.yaml`
+
+The remaining iterations resumed from the 10,000 checkpoint using:
+
+`configs/gaitpart_casiab_30000.yaml`
+
+From the OpenGait directory:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 torchrun \
+  --standalone \
+  --nproc_per_node=1 \
+  opengait/main.py \
+  --cfgs ../../configs/gaitpart_casiab_30000.yaml \
+  --phase train \
+  --log_to_file
+```
+
+This resume command requires the existing iteration-10,000 checkpoint.
+
+### Evaluate the 30,000-Iteration Checkpoint
+
+From the repository root:
+
+```bash
+cd third_party/OpenGait
+```
+
+Run:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 torchrun \
+  --standalone \
+  --nproc_per_node=1 \
+  opengait/main.py \
+  --cfgs ../../configs/gaitpart_casiab_eval_30000.yaml \
+  --phase test \
+  --log_to_file
+```
+
+Verified Rank-1 results, excluding identical-view comparisons:
+
+| Condition | Accuracy |
+|---|---:|
+| Normal walking (NM) | 94.20% |
+| Carrying a bag (BG) | 87.19% |
+| Clothing variation (CL) | 73.03% |
+
+### Matched GEI vs. GaitPart Evaluation
+
+For the controlled 90-degree normal-walking comparison, both methods used CASIA-B subjects 075–124, gallery sequences `nm-01` through `nm-04`, and probe sequences `nm-05` and `nm-06`.
+
+The GEI baseline achieved 95.00% Rank-1 accuracy.
+
+The GaitPart model achieved 100.00% Rank-1 accuracy.
+
+All 300 intended GaitPart gallery and probe sequences were confirmed present.
+
+The matched-view reporting modification is provided as:
+
+`patches/gaitpart_matched_90.patch`
+
+To apply it to a clean checkout of the pinned OpenGait implementation, from the Project 2 root:
+
+```bash
+git -C third_party/OpenGait apply \
+  ../../patches/gaitpart_matched_90.patch
+```
+
+The patch must not be applied twice. It adds reporting for the 90° → 90° Rank-1 result without changing GaitPart's identification calculations.
+
+### Temporal Sequence-Length Ablation
+
+The same 30,000-iteration checkpoint was evaluated under four inference-frame settings:
+
+| Maximum frames | NM | BG | CL |
+|---|---:|---:|---:|
+| 15 | 63.99% | 54.19% | 42.32% |
+| 30 | 86.25% | 76.34% | 62.16% |
+| 50 | 91.77% | 84.22% | 70.13% |
+| Unlimited | 94.20% | 87.19% | 73.03% |
+
+To reproduce the limited-frame evaluations, run from `third_party/OpenGait`:
+
+```bash
+for frames in 15 30 50; do
+    CUDA_VISIBLE_DEVICES=0 torchrun \
+      --standalone \
+      --nproc_per_node=1 \
+      opengait/main.py \
+      --cfgs ../../configs/gaitpart_casiab_ablation_${frames}frames.yaml \
+      --phase test \
+      --log_to_file
+done
+```
+
+The ablation uses OpenGait's `frames_all_limit` setting, which selects the first N available frames from each sequence. Sequences shorter than the limit retain their available frames.
+
+The experiment demonstrates the effect of temporal input truncation but does not isolate individual architectural components.
+
+### Experiment Outputs
+
+Structured experimental results are preserved in:
+
+- `results/tables/temporal_ablation.csv`
+- `results/tables/training_stage_results.csv`
+- `results/tables/matched_model_comparison.csv`
+- `results/tables/gei_matched_predictions.csv`
+- `results/tables/gei_matched_summary.json`
+
+The complete chronological experiment record is maintained in:
+
+`experiments/experiment_log.md`
+
+### Checkpoint Availability
+
+Model checkpoints are stored locally under:
+
+`third_party/OpenGait/output/CASIA-B/GaitPart/`
+
+They are excluded from the Git repository due to file size.
+
+Reproducing the checkpoint-dependent evaluations requires training the model using the documented configurations or obtaining the corresponding checkpoint separately.
+
+### Reproduction Limitations
+
+The final experiment used 30,000 rather than 120,000 reference iterations, a smaller training batch, and a single RTX 3060 GPU.
+
+The environment export has not been tested on a fresh machine. Results may also vary across hardware and software environments.
+
+The project provides the configurations, source code, experiment records, and result tables needed to inspect and reproduce the methodology.
