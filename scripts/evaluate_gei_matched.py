@@ -7,12 +7,26 @@ import numpy as np
 
 # Resolve both repositories without modifying Project 1.
 PROJECT2 = Path(__file__).resolve().parents[1]
-PROJECT1 = PROJECT2.parent / "biometrics-project1-gait-recognition"
 
-sys.path.insert(0, str(PROJECT1 / "src"))
+# Import the original GEI implementation copied from Project 1.
+sys.path.insert(0, str(PROJECT2 / "scripts" / "gei_baseline"))
 from gei import generate_gei
 
-DATA = PROJECT1 / "data/raw/CASIA-B/GaitDatasetB-silh"
+# Default to the original Project 1 dataset location.
+# This can be overridden using the CASIAB_RAW_ROOT environment variable.
+import os
+
+DATA = Path(
+    os.environ.get(
+        "CASIAB_RAW_ROOT",
+        str(
+            PROJECT2.parent
+            / "biometrics-project1-gait-recognition"
+            / "data/raw/CASIA-B/GaitDatasetB-silh"
+        )
+    )
+)
+
 OUTPUT = PROJECT2 / "results/tables"
 
 VIEW = "090"
